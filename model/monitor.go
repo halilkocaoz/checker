@@ -1,5 +1,9 @@
 package model
 
+import (
+	"net/http"
+)
+
 // upmo monitor
 type Monitor struct {
 	ID         string
@@ -12,4 +16,19 @@ type Monitor struct {
 
 	Headers    []KVPair
 	PostValues []KVPair
+}
+
+// does http request and return result
+func (monitor *Monitor) DoRequest() (*http.Response, error) {
+	return nil, nil
+}
+
+// gets and sets header values from database
+func (m *Monitor) SetHeaders() {
+	m.Headers = nil
+}
+
+// gets and sets post form values from database
+func (m *Monitor) SetPostValues() {
+	m.PostValues = nil
 }
