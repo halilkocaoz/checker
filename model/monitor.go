@@ -2,6 +2,8 @@ package model
 
 import (
 	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/halilkocaoz/upmo-checker/storage"
 )
@@ -22,13 +24,37 @@ type Monitor struct {
 
 // does http request and return result
 func (monitor *Monitor) DoRequest() (*http.Response, error) {
-	return nil, nil
+	client := http.Client{}
+	client.Timeout = time.Duration(time.Millisecond * time.Duration(monitor.TimeoutMs))
+	hostUrl, err := url.Parse(monitor.Host)
+	if err != nil {
+		return nil, err
+	}
+	request := new(http.Request)
+	request.URL = hostUrl
+	request.Method = monitor.Method
+	request.Header = make(http.Header)
+
+	for _, header := range monitor.Headers {
+		request.Header.Add(header.Key, header.Value)
+	}
+	if monitor.Method == "POST" && len(monitor.PostValues) > 0 {
+		request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+		form := url.Values{}
+		for _, postform := range monitor.PostValues {
+			form.Add(postform.Key, postform.Value)
+		}
+		request.PostForm = form
+	}
+
+	return client.Do(request)
 }
 
 // gets and sets header values from database
 func (m *Monitor) SetHeaders() {
 	headers := make([]KVPair, 0)
-	db, _ := storage.UpMoDBConnection()
+	db, _ := storage.UpMoDBConn()
 	defer db.Close()
 
 	headerRows, _ := db.Query(`SELECT 
@@ -50,7 +76,7 @@ func (m *Monitor) SetHeaders() {
 // gets and sets post form values from database
 func (m *Monitor) SetPostValues() {
 	postForms := make([]KVPair, 0)
-	db, _ := storage.UpMoDBConnection()
+	db, _ := storage.UpMoDBConn()
 	defer db.Close()
 
 	postFormRows, _ := db.Query(`SELECT
