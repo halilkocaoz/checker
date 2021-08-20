@@ -1,4 +1,4 @@
-module github.com/halilkocaoz/upmo-checker
+module github.com/halilkocaoz/upsmo-checker
 
 go 1.16
 

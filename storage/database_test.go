@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-func TestUpMoDbConn(t *testing.T) {
-	_, err := UpMoDBConn()
+func TestUpsMoDbConn(t *testing.T) {
+	_, err := UpsMoDBConn()
 	if err != nil {
 		t.Errorf(err.Error())
 	}

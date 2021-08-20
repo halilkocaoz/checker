@@ -6,8 +6,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func UpMoDBConn() (*sql.DB, error) {
-	db, err := sql.Open("postgres", "host=localhost port=5432 dbname=UpMo user=postgres password=password")
+func UpsMoDBConn() (*sql.DB, error) {
+	db, err := sql.Open("postgres", "host=localhost port=5432 dbname=UpsMo user=postgres password=password")
 
 	if err != nil {
 		return nil, err

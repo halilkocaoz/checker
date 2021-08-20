@@ -5,10 +5,10 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/halilkocaoz/upmo-checker/storage"
+	"github.com/halilkocaoz/upsmo-checker/storage"
 )
 
-// upmo monitor
+// UpsMo monitor
 type Monitor struct {
 	ID         string
 	Host       string
@@ -54,7 +54,7 @@ func (monitor *Monitor) DoRequest() (*http.Response, error) {
 // gets and sets header values from database
 func (m *Monitor) SetHeaders() {
 	headers := make([]KVPair, 0)
-	db, _ := storage.UpMoDBConn()
+	db, _ := storage.UpsMoDBConn()
 	defer db.Close()
 
 	headerRows, _ := db.Query(`SELECT 
@@ -76,7 +76,7 @@ func (m *Monitor) SetHeaders() {
 // gets and sets post form values from database
 func (m *Monitor) SetPostValues() {
 	postForms := make([]KVPair, 0)
-	db, _ := storage.UpMoDBConn()
+	db, _ := storage.UpsMoDBConn()
 	defer db.Close()
 
 	postFormRows, _ := db.Query(`SELECT
