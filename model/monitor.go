@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"net/http"
 	"net/url"
 	"time"
@@ -18,8 +19,33 @@ type Monitor struct {
 	TimeoutMs  int
 	CreatedAt  string
 
+	Deleted bool
+
 	Headers    []KVPair
 	PostValues []KVPair
+}
+
+// reget gets the monitor from database and pass new values.
+// if it's deleted or its region is changed, marks as deleted.
+func (m *Monitor) reGet() {
+	db, _ := storage.UpsMoDBConn()
+	defer db.Close()
+
+	if err := db.QueryRow(`SELECT "Host",
+	"Method",
+	"Region",
+	"IntervalMs",
+	"TimeoutMs"
+	FROM "Monitors"
+	WHERE ("DeletedAt" IS NULL AND "Region" = $1 AND "ID" = $2)`, m.Region, m.ID).Scan(&m.Host,
+		&m.Method,
+		&m.Region,
+		&m.IntervalMs,
+		&m.TimeoutMs); err != nil {
+		if err == sql.ErrNoRows {
+			m.Deleted = true
+		}
+	}
 }
 
 // does http request and return result
@@ -38,6 +64,7 @@ func (monitor *Monitor) doRequest() (*http.Response, error) {
 	for _, header := range monitor.Headers {
 		request.Header.Add(header.Key, header.Value)
 	}
+
 	if monitor.Method == "POST" && len(monitor.PostValues) > 0 {
 		request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
