@@ -23,7 +23,7 @@ type Monitor struct {
 }
 
 // does http request and return result
-func (monitor *Monitor) DoRequest() (*http.Response, error) {
+func (monitor *Monitor) doRequest() (*http.Response, error) {
 	client := http.Client{}
 	client.Timeout = time.Duration(time.Millisecond * time.Duration(monitor.TimeoutMs))
 	hostUrl, err := url.Parse(monitor.Host)
@@ -52,7 +52,7 @@ func (monitor *Monitor) DoRequest() (*http.Response, error) {
 }
 
 // gets and sets header values from database
-func (m *Monitor) SetHeaders() {
+func (m *Monitor) setHeaders() {
 	headers := make([]KVPair, 0)
 	db, _ := storage.UpsMoDBConn()
 	defer db.Close()
@@ -74,7 +74,7 @@ func (m *Monitor) SetHeaders() {
 }
 
 // gets and sets post form values from database
-func (m *Monitor) SetPostValues() {
+func (m *Monitor) setPostValues() {
 	postForms := make([]KVPair, 0)
 	db, _ := storage.UpsMoDBConn()
 	defer db.Close()
