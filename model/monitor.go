@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -23,6 +24,20 @@ type Monitor struct {
 
 	Headers    []KVPair
 	PostValues []KVPair
+}
+
+func (m *Monitor) DoRequest() (*http.Response, error) {
+	m.reGet()
+	if m.Deleted {
+		return nil, fmt.Errorf("Monitor(%v) is deleted from the queue", m)
+	}
+
+	m.setHeaders()
+	if m.Method == "POST" {
+		m.setPostValues()
+	}
+
+	return m.doRequest()
 }
 
 // reget gets the monitor from database and pass new values.
