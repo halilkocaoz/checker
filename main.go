@@ -3,12 +3,26 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/halilkocaoz/upsmo-checker/model"
 	"github.com/halilkocaoz/upsmo-checker/storage"
 )
 
-var region string
+var (
+	region                string = ""
+	pureMonitorsStatement string = `SELECT "ID", 
+	"Host", 
+	"Method", 
+	"Region", 
+	"IntervalMs", 
+	"TimeoutMs", 
+	"CreatedAt" 
+	FROM "Monitors" 
+	%s 
+	ORDER BY "CreatedAt"`
+	byRegion string = fmt.Sprintf(pureMonitorsStatement, `WHERE ("DeletedAt" IS NULL AND "Region" = '%s')`)
+)
 
 func main() {
 	regionByte, err := ioutil.ReadFile("region")
@@ -16,6 +30,22 @@ func main() {
 		panic(fmt.Sprintf("Program cannot be executed with error about region file.\n%v", err))
 	}
 	region = string(regionByte)
+
+existMonitors:
+	statement := fmt.Sprintf(byRegion, region)
+	monitors, _ := getMonitorsByStatement(statement)
+	if len(monitors) == 0 {
+		fmt.Printf("There is no monitor with region: %v\n", region)
+		time.Sleep(10 * time.Second)
+		goto existMonitors
+	}
+	processMonitors(monitors)
+}
+
+func processMonitors(monitors []*model.Monitor) {
+	for _, mn := range monitors {
+		go mn.Process()
+	}
 }
 
 func getMonitorsByStatement(statement string) ([]*model.Monitor, error) {
