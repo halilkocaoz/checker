@@ -1,12 +1,21 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
+
 	"github.com/halilkocaoz/upsmo-checker/model"
 	"github.com/halilkocaoz/upsmo-checker/storage"
 )
 
-func main() {
+var region string
 
+func main() {
+	regionByte, err := ioutil.ReadFile("region")
+	if err != nil {
+		panic(fmt.Sprintf("Program cannot be executed with error about region file.\n%v", err))
+	}
+	region = string(regionByte)
 }
 
 func getMonitorsByStatement(statement string) ([]*model.Monitor, error) {
