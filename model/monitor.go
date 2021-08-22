@@ -39,18 +39,28 @@ func (m *Monitor) Process() {
 			m.setPostValues()
 		}
 
-		res, err := m.doRequest()
+		resp, err := m.doRequest()
 		if err != nil {
 			// todo log
 			fmt.Println(err)
 		} else {
-			// todo insert response to database. if it's not succes, push notifier service
-			res.Body.Close()
-			fmt.Printf("%d: %v\n", res.StatusCode, m)
+			resp.Body.Close()
+			go m.writeResponseToDatabase(resp)
+			if resp.StatusCode < 400 {
+				//todo if it's not succes, push notifier service
+			}
+			fmt.Printf("%d: %v\n", resp.StatusCode, m)
 		}
 
 		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
 	}
+}
+
+func (m *Monitor) writeResponseToDatabase(resp *http.Response) {
+	insertResponseStatement := `INSERT INTO "Responses" ("MonitorID", "StatusCode") VALUES ($1, $2);`
+	db, _ := storage.UpsMoDBConn()
+	defer db.Close()
+	db.Exec(insertResponseStatement, m.ID, resp.StatusCode)
 }
 
 // reget gets the monitor from database and pass new values.
