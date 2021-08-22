@@ -21,7 +21,8 @@ var (
 	FROM "Monitors" 
 	%s 
 	ORDER BY "CreatedAt"`
-	byRegion string = fmt.Sprintf(pureMonitorsStatement, `WHERE ("DeletedAt" IS NULL AND "Region" = '%s')`)
+	byRegion                        string = fmt.Sprintf(pureMonitorsStatement, `WHERE ("DeletedAt" IS NULL AND "Region" = '%s')`)
+	byRegionAndGreaterThanCreatedAt string = fmt.Sprintf(pureMonitorsStatement, `WHERE ("DeletedAt" IS NULL AND "Region" = '%s' AND "CreatedAt" > '%s')`)
 )
 
 func main() {
@@ -40,6 +41,17 @@ existMonitors:
 		goto existMonitors
 	}
 	processMonitors(monitors)
+	lastMonitor := monitors[len(monitors)-1]
+
+getNewMonitors:
+	statement = fmt.Sprintf(byRegionAndGreaterThanCreatedAt, region, lastMonitor.CreatedAt)
+	monitors, _ = getMonitorsByStatement(statement)
+	if len(monitors) > 0 {
+		processMonitors(monitors)
+		lastMonitor = monitors[len(monitors)-1]
+	}
+	time.Sleep(30 * time.Second)
+	goto getNewMonitors
 }
 
 func processMonitors(monitors []*model.Monitor) {
