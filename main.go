@@ -32,7 +32,7 @@ func main() {
 	}
 	region = string(regionByte)
 
-existMonitors:
+existMonitors: // get exist monitors and put them into process
 	statement := fmt.Sprintf(byRegion, region)
 	monitors, _ := getMonitorsByStatement(statement)
 	if len(monitors) == 0 {
@@ -43,7 +43,7 @@ existMonitors:
 	processMonitors(monitors)
 	lastMonitor := monitors[len(monitors)-1]
 
-getNewMonitors:
+newMonitors: // get new monitors(according to lastMonitor.CreatedAt) and put them into process
 	statement = fmt.Sprintf(byRegionAndGreaterThanCreatedAt, region, lastMonitor.CreatedAt)
 	monitors, _ = getMonitorsByStatement(statement)
 	if len(monitors) > 0 {
@@ -51,7 +51,7 @@ getNewMonitors:
 		lastMonitor = monitors[len(monitors)-1]
 	}
 	time.Sleep(30 * time.Second)
-	goto getNewMonitors
+	goto newMonitors
 }
 
 func processMonitors(monitors []*model.Monitor) {

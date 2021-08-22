@@ -26,6 +26,8 @@ type Monitor struct {
 	PostValues []KVPair
 }
 
+// it puts the monitor into process. before every process, refill the necessary information from database
+// and takes action according the results.
 func (m *Monitor) Process() {
 	for {
 		m.reGet()
