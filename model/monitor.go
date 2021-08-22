@@ -26,18 +26,31 @@ type Monitor struct {
 	PostValues []KVPair
 }
 
-func (m *Monitor) DoRequest() (*http.Response, error) {
-	m.reGet()
-	if m.Deleted {
-		return nil, fmt.Errorf("Monitor(%v) is deleted from the queue", m)
-	}
+func (m *Monitor) Process() {
+	for {
+		m.reGet()
+		if m.Deleted { // if it's marked as deleted, free it
+			m = nil
+			return
+		}
 
-	m.setHeaders()
-	if m.Method == "POST" {
-		m.setPostValues()
-	}
+		m.setHeaders()
+		if m.Method == "POST" {
+			m.setPostValues()
+		}
 
-	return m.doRequest()
+		res, err := m.doRequest()
+		if err != nil {
+			// todo log
+			fmt.Println(err)
+		} else {
+			// todo insert response to database. if it's not succes, push notifier service
+			res.Body.Close()
+			fmt.Printf("%d: %v\n", res.StatusCode, m)
+		}
+
+		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
+	}
 }
 
 // reget gets the monitor from database and pass new values.
@@ -48,15 +61,14 @@ func (m *Monitor) reGet() {
 
 	if err := db.QueryRow(`SELECT "Host",
 	"Method",
-	"Region",
 	"IntervalMs",
 	"TimeoutMs"
 	FROM "Monitors"
-	WHERE ("DeletedAt" IS NULL AND "Region" = $1 AND "ID" = $2)`, m.Region, m.ID).Scan(&m.Host,
-		&m.Method,
-		&m.Region,
-		&m.IntervalMs,
-		&m.TimeoutMs); err != nil {
+	WHERE ("DeletedAt" IS NULL AND "Region" = $1 AND "ID" = $2)`, m.Region, m.ID).
+		Scan(&m.Host,
+			&m.Method,
+			&m.IntervalMs,
+			&m.TimeoutMs); err != nil {
 		if err == sql.ErrNoRows {
 			m.Deleted = true
 		}
