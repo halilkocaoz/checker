@@ -2,13 +2,15 @@ package storage
 
 import (
 	"database/sql"
+	"os"
 
 	_ "github.com/lib/pq"
 )
 
-func UpsMoDBConn() (*sql.DB, error) {
-	db, err := sql.Open("postgres", "host=localhost port=5432 dbname=UpsMo user=postgres password=password")
+var connstr = os.Getenv("AZURE_POSTGRES_CONNSTR")
 
+func UpsMoDBConn() (*sql.DB, error) {
+	db, err := sql.Open("postgres", connstr)
 	if err != nil {
 		return nil, err
 	}
