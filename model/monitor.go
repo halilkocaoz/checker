@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/halilkocaoz/upsmo-checker/storage"
+	"github.com/halilkocaoz/upsmo-checker/stream"
 )
 
 // UpsMo monitor
@@ -35,7 +36,6 @@ func (m *Monitor) Process() {
 			m = nil
 			return
 		}
-
 		m.setHeaders()
 		if m.Method == "POST" {
 			m.setPostValues()
@@ -43,17 +43,16 @@ func (m *Monitor) Process() {
 
 		resp, err := m.doRequest()
 		if err != nil {
-			// todo log
-			fmt.Println(err)
+			go stream.SendToServiceBus("err-notifier", fmt.Sprintf("%s %v", m.ID, err))
 		} else {
 			resp.Body.Close()
-			go m.writeResponseToDatabase(resp)
-			if resp.StatusCode < 400 {
-				//todo if it's not succes, push notifier service
+			message := fmt.Sprintf("%s %d", m.ID, resp.StatusCode)
+			go stream.SendToServiceBus("response-database-inserter", message)
+			if resp.StatusCode > 400 {
+				go stream.SendToServiceBus("notifier", message)
 			}
 			fmt.Printf("%d: %v\n", resp.StatusCode, m)
 		}
-
 		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
 	}
 }
