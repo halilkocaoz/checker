@@ -106,6 +106,7 @@ func (monitor *Monitor) doRequest() (*http.Response, error) {
 		}
 		request.PostForm = form
 	}
+	request.Header.Set("User-Agent", "UpsMo/v1.0 (https://github.com/halilkocaoz/upsmo-checker)")
 
 	return client.Do(request)
 }
