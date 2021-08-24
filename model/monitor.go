@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -51,7 +52,7 @@ func (m *Monitor) Process() {
 			if resp.StatusCode > 400 {
 				go stream.SendToServiceBus("notifier", message)
 			}
-			fmt.Printf("%d: %v\n", resp.StatusCode, m)
+			log.Printf("%d: %v\n", resp.StatusCode, m)
 		}
 		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
 	}
