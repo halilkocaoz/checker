@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -55,6 +56,11 @@ newMonitors: // get new monitors(according to lastMonitor.CreatedAt) and put the
 func processMonitors(monitors []*model.Monitor) {
 	for _, mn := range monitors {
 		go mn.Process()
+		/* 	existMonitors section can send ton of monitor to process and
+		vm has one core cpu. so vm may not be enough for all of them in same time.
+		* put at least 0.5 sec difference between process because of this. */
+		time.Sleep(500 * time.Millisecond)
+		log.Printf("%s is in processing", mn.ID)
 	}
 }
 
