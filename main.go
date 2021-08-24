@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/halilkocaoz/upsmo-checker/model"
@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	region                string = ""
+	region                string = os.Getenv("REGION")
 	pureMonitorsStatement string = `SELECT "ID", 
 	"Host", 
 	"Method", 
@@ -26,11 +26,9 @@ var (
 )
 
 func main() {
-	regionByte, err := ioutil.ReadFile("region")
-	if err != nil {
-		panic(fmt.Sprintf("Program cannot be executed with error about region file.\n%v", err))
+	if !(len(region) > 0) {
+		panic("Program cannot be executed without region")
 	}
-	region = string(regionByte)
 
 existMonitors: // get exist monitors and put them into process
 	statement := fmt.Sprintf(byRegion, region)
