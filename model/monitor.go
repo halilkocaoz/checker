@@ -34,9 +34,11 @@ func (m *Monitor) Process() {
 	for {
 		m.reGet()
 		if m.Deleted { // if it's marked as deleted, free it
+			log.Printf("PROCESS OUT	: %s %s", m.ID, m.Host)
 			m = nil
 			return
 		}
+
 		m.setHeaders()
 		if m.Method == "POST" {
 			m.setPostValues()
@@ -47,13 +49,16 @@ func (m *Monitor) Process() {
 			go stream.SendToServiceBus("err-notifier", fmt.Sprintf("%s %v", m.ID, err))
 		} else {
 			resp.Body.Close()
+
 			message := fmt.Sprintf("%s %d", m.ID, resp.StatusCode)
 			go stream.SendToServiceBus("response-database-inserter", message)
 			if resp.StatusCode > 400 {
 				go stream.SendToServiceBus("notifier", message)
 			}
+
 			log.Printf("RESPONSE	: %d - %v\n", resp.StatusCode, m)
 		}
+
 		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
 	}
 }

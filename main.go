@@ -60,7 +60,7 @@ func processMonitors(monitors []*model.Monitor) {
 		vm has one core cpu. so vm may not be enough for all of them in same time.
 		* put at least 0.5 sec difference between process because of this. */
 		time.Sleep(500 * time.Millisecond)
-		log.Printf("%s is in processing", mn.ID)
+		log.Printf("PROCESS IN	: %s %s", mn.ID, mn.Host)
 	}
 }
 
