@@ -21,3 +21,7 @@ Look [here](https://github.com/halilkocaoz/upsmo-server/blob/main/UpsMo.Common/M
 * [upsmo-response-inserter](https://github.com/halilkocaoz/upsmo-response-inserter)
 * [upsmo-notifier](https://github.com/halilkocaoz/upsmo-notifier)
 * [upsmo-server](https://github.com/halilkocaoz/upsmo-server)
+
+## Screenshot
+
+![cli](./assets/checker.png)
