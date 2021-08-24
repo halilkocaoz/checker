@@ -52,7 +52,7 @@ func (m *Monitor) Process() {
 			if resp.StatusCode > 400 {
 				go stream.SendToServiceBus("notifier", message)
 			}
-			log.Printf("%d: %v\n", resp.StatusCode, m)
+			log.Printf("RESPONSE	: %d - %v\n", resp.StatusCode, m)
 		}
 		time.Sleep(time.Duration(m.IntervalMs) * time.Millisecond)
 	}

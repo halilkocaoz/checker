@@ -21,6 +21,6 @@ func SendToServiceBus(topic string, message string) {
 	if err != nil {
 		log.Println(err)
 	} else {
-		log.Printf(`"%s" sent --> %s`, message, topic)
+		log.Printf(`SERVICEBUS	: "%s" sent --> %s`, message, topic)
 	}
 }
