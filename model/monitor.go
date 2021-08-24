@@ -57,13 +57,6 @@ func (m *Monitor) Process() {
 	}
 }
 
-func (m *Monitor) writeResponseToDatabase(resp *http.Response) {
-	insertResponseStatement := `INSERT INTO "Responses" ("MonitorID", "StatusCode") VALUES ($1, $2);`
-	db, _ := storage.UpsMoDBConn()
-	defer db.Close()
-	db.Exec(insertResponseStatement, m.ID, resp.StatusCode)
-}
-
 // reget gets the monitor from database and pass new values.
 // if it's deleted or its region is changed, marks as deleted.
 func (m *Monitor) reGet() {
