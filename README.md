@@ -9,7 +9,7 @@ It runs in different locations on the Azure virtual machines and checks uptime m
 ## Installation & Run
 
 * `git clone https://github.com/halilkocaoz/upsmo-checker.git`
-* `export REGION="DE_Frankfurt"`  
+* `export UPSMO_REGION="DE_Frankfurt"`  
 Look [here](https://github.com/halilkocaoz/upsmo-server/blob/main/UpsMo.Common/Monitor/MonitorRegion.cs) for more
 * `export AZURE_POSTGRES_CONNSTR="host=name.postgres.database.azure.com port=5432 dbname=- user=- password=-"`
 * `export SERVICE_BUS_NAMESPACE="namespace"`

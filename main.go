@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	region                string = os.Getenv("REGION")
+	region                string = os.Getenv("UPSMO_REGION")
 	pureMonitorsStatement string = `SELECT "ID", 
 	"Host", 
 	"Method", 
