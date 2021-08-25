@@ -111,8 +111,8 @@ func (monitor *Monitor) doRequest() (*http.Response, error) {
 		}
 		request.PostForm = form
 	}
-	request.Header.Set("User-Agent", "UpsMo/v1.0 (https://github.com/halilkocaoz/upsmo-checker)")
 
+	request.Header.Set("User-Agent", fmt.Sprintf("UpsMo/v1.0 (REGION: %s, https://github.com/halilkocaoz/upsmo-checker)", monitor.Region))
 	return client.Do(request)
 }
 
