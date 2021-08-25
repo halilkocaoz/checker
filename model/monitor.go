@@ -50,7 +50,7 @@ func (m *Monitor) Process() {
 		} else {
 			resp.Body.Close()
 
-			message := fmt.Sprintf("%s %d", m.ID, resp.StatusCode)
+			message := fmt.Sprintf("%s %d %s", m.ID, resp.StatusCode, m.Region)
 			go stream.SendToServiceBus("response-database-inserter", message)
 			if resp.StatusCode > 400 {
 				go stream.SendToServiceBus("notifier", message)
