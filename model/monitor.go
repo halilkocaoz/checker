@@ -1,6 +1,7 @@
 package model
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"fmt"
 	"log"
@@ -91,16 +92,23 @@ var userAgent string = fmt.Sprintf("UpsMo/v1.0 (REGION: %s, https://github.com/h
 
 // does http request and return result
 func (monitor *Monitor) doRequest() (*http.Response, error) {
-	client := http.Client{}
-	client.Timeout = time.Duration(time.Millisecond * time.Duration(monitor.TimeoutMs))
-	hostUrl, err := url.Parse(monitor.Host)
+	client := http.Client{
+		Timeout: time.Duration(time.Millisecond * time.Duration(monitor.TimeoutMs)),
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+	requestUrl, err := url.Parse(monitor.Host)
 	if err != nil {
 		return nil, err
 	}
-	request := new(http.Request)
-	request.URL = hostUrl
-	request.Method = monitor.Method
-	request.Header = make(http.Header)
+	request := &http.Request{
+		URL:    requestUrl,
+		Method: monitor.Method,
+		Header: make(http.Header),
+	}
 	request.Header.Set("User-Agent", userAgent)
 
 	if monitor.Method == "POST" && len(monitor.PostValues) > 0 {
