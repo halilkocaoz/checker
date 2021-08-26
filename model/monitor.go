@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/halilkocaoz/upsmo-checker/storage"
@@ -47,6 +48,7 @@ func (m *Monitor) Process() {
 		resp, err := m.doRequest()
 		if err != nil {
 			go stream.SendToServiceBus("err-notifier", fmt.Sprintf("%s %v", m.ID, err))
+			log.Printf("ERROR		: %v\n%v", m, err)
 		} else {
 			resp.Body.Close()
 
@@ -85,6 +87,8 @@ func (m *Monitor) reGet() {
 	}
 }
 
+var userAgent string = fmt.Sprintf("UpsMo/v1.0 (REGION: %s, https://github.com/halilkocaoz/upsmo-checker)", os.Getenv("UPSMO_REGION"))
+
 // does http request and return result
 func (monitor *Monitor) doRequest() (*http.Response, error) {
 	client := http.Client{}
@@ -97,13 +101,10 @@ func (monitor *Monitor) doRequest() (*http.Response, error) {
 	request.URL = hostUrl
 	request.Method = monitor.Method
 	request.Header = make(http.Header)
-
-	for _, header := range monitor.Headers {
-		request.Header.Add(header.Key, header.Value)
-	}
+	request.Header.Set("User-Agent", userAgent)
 
 	if monitor.Method == "POST" && len(monitor.PostValues) > 0 {
-		request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 		form := url.Values{}
 		for _, postform := range monitor.PostValues {
@@ -111,8 +112,10 @@ func (monitor *Monitor) doRequest() (*http.Response, error) {
 		}
 		request.PostForm = form
 	}
+	for _, header := range monitor.Headers {
+		request.Header.Add(header.Key, header.Value)
+	}
 
-	request.Header.Set("User-Agent", fmt.Sprintf("UpsMo/v1.0 (REGION: %s, https://github.com/halilkocaoz/upsmo-checker)", monitor.Region))
 	return client.Do(request)
 }
 

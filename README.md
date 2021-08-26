@@ -1,6 +1,6 @@
 # upsmo-checker
 
-It runs in different locations on the Azure virtual machines and checks uptime monitors by region and takes actions according to the HTTP response, such as sending messages to the Azure service bus.
+It runs in different locations on the Azure VMs and checks uptime monitors by region. Also, it takes actions according to the HTTP responses, such as sending messages to the Azure Service Bus.
 
 ## Prerequisites to run
 
@@ -18,9 +18,9 @@ Look [here](https://github.com/halilkocaoz/upsmo-server/blob/main/UpsMo.Common/M
 
 ## Related repositories
 
-* [upsmo-response-inserter](https://github.com/halilkocaoz/upsmo-response-inserter)
-* [upsmo-notifier](https://github.com/halilkocaoz/upsmo-notifier)
 * [upsmo-server](https://github.com/halilkocaoz/upsmo-server)
+* [upsmo-inserter](https://github.com/halilkocaoz/upsmo-inserter)
+* [upsmo-notifier](https://github.com/halilkocaoz/upsmo-notifier)
 
 ## Screenshot
 
